@@ -1,0 +1,795 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Substantiva × Adverbial</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,700;12..96,800&family=Caveat:wght@700&display=swap">
+<style>
+/* Layout: um palco 16:9 que escala com a tela (modo apresentação); no celular os slides viram uma coluna rolável.
+   Identidade: caderno quadriculado + blocos de montar. Azul = substantiva (peça que completa), laranja = adverbial (etiqueta de circunstância). */
+:root{
+  --paper:#EEF1F7; --grid:#DCE2EE; --desk:#DDE2EC; --panel:#FFFFFF; --line:#CBD3E3;
+  --ink:#171A26; --muted:#4F5775;
+  --slate:#2B3042; --slate-2:#191C29; --slate-ink:#F5F6FA;
+  --blue:#2F5BEA; --blue-2:#1E3FB0; --blue-soft:#E3E9FD; --blue-ink:#FFFFFF; --blue-text:#2348C8;
+  --orange:#FF7A1A; --orange-2:#C95604; --orange-soft:#FFEBDC; --orange-ink:#2A1606; --orange-text:#B84F00;
+  --hl:#FFD84D; --hl-soft:#FFF3C4; --hl-ink:#171A26;
+  --green:#178A52; --green-soft:#DDF3E7; --red:#D93A40; --red-soft:#FBE1E2;
+  --display:"Bricolage Grotesque", "Segoe UI", system-ui, sans-serif;
+  --body:"Atkinson Hyperlegible", "Segoe UI", system-ui, sans-serif;
+  --hand:"Caveat", "Comic Sans MS", cursive;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --paper:#151A2E; --grid:#20263E; --desk:#0D1120; --panel:#1D2340; --line:#2F3758;
+  --ink:#EEF0F8; --muted:#A9B1CF;
+  --slate:#353D5E; --slate-2:#232946; --slate-ink:#F5F6FA;
+  --blue:#4A72F5; --blue-2:#2C4DC4; --blue-soft:#1F2B5C; --blue-ink:#FFFFFF; --blue-text:#93AAFF;
+  --orange:#FF8A33; --orange-2:#B85308; --orange-soft:#3D2614; --orange-ink:#2A1606; --orange-text:#FFB27A;
+  --hl:#FFD84D; --hl-soft:#FFF3C4; --hl-ink:#171A26;
+  --green:#3CC383; --green-soft:#173828; --red:#FF6B70; --red-soft:#3E1C22; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --paper:#151A2E; --grid:#20263E; --desk:#0D1120; --panel:#1D2340; --line:#2F3758;
+  --ink:#EEF0F8; --muted:#A9B1CF;
+  --slate:#353D5E; --slate-2:#232946; --slate-ink:#F5F6FA;
+  --blue:#4A72F5; --blue-2:#2C4DC4; --blue-soft:#1F2B5C; --blue-ink:#FFFFFF; --blue-text:#93AAFF;
+  --orange:#FF8A33; --orange-2:#B85308; --orange-soft:#3D2614; --orange-ink:#2A1606; --orange-text:#FFB27A;
+  --hl:#FFD84D; --hl-soft:#FFF3C4; --hl-ink:#171A26;
+  --green:#3CC383; --green-soft:#173828; --red:#FF6B70; --red-soft:#3E1C22; color-scheme:dark}
+
+html,body{height:100%}
+body{background:var(--desk);color:var(--ink);font-family:var(--body);margin:0}
+*{box-sizing:border-box}
+button{font:inherit;color:inherit;cursor:pointer}
+:focus-visible{outline:3px solid var(--blue);outline-offset:3px}
+
+/* ---------- app shell ---------- */
+.app{height:100%;display:grid;grid-template-rows:1fr auto;padding-left:max(16px, env(safe-area-inset-left, 0px));padding-right:max(16px, env(safe-area-inset-right, 0px));padding-block:14px 0}
+.viewport{display:grid;place-items:center;min-height:0}
+.stage{position:relative;width:min(100%, calc((100dvh - 92px) * 16 / 9));aspect-ratio:16/9;container-type:inline-size;border-radius:14px;overflow:hidden;
+  box-shadow:0 30px 70px -30px rgba(10,14,30,.45), 0 0 0 1px var(--line);background:var(--paper)}
+.progress{position:absolute;left:0;top:0;height:5px;background:var(--blue);z-index:5;transition:width .4s ease}
+.bar{display:flex;align-items:center;justify-content:center;gap:10px;padding-block:12px 14px;flex-wrap:wrap}
+.bar .count{font:700 15px/1 var(--body);letter-spacing:.06em;color:var(--muted);min-width:15ch;text-align:center;font-variant-numeric:tabular-nums}
+.bar .count b{color:var(--ink)}
+.btn{border:1px solid var(--line);background:var(--panel);border-radius:999px;padding:9px 16px;font:700 14px/1 var(--body);display:inline-flex;gap:8px;align-items:center}
+.btn:hover{border-color:var(--blue)}
+.btn[aria-pressed="true"]{background:var(--blue);border-color:var(--blue);color:var(--blue-ink)}
+.btn kbd{font:700 11px/1 var(--body);border:1px solid currentColor;border-radius:4px;padding:2px 5px;opacity:.7}
+.btn.nav{width:44px;height:40px;justify-content:center;padding:0;font-size:20px}
+.notes-panel{display:none;max-width:1100px;margin:0 auto 12px;background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:14px 18px;font:400 17px/1.5 var(--body);color:var(--ink)}
+.notes-panel strong{font:700 12px/1 var(--body);letter-spacing:.14em;text-transform:uppercase;color:var(--muted);display:block;margin-bottom:6px}
+.show-notes .notes-panel{display:block}
+
+/* ---------- slide base (k = 1% da largura do slide) ---------- */
+.slide{--k:1cqw;position:absolute;inset:0;padding:calc(var(--k)*3.6) calc(var(--k)*5.2) calc(var(--k)*3.2);display:flex;flex-direction:column;gap:calc(var(--k)*1.6);
+  background-color:var(--paper);
+  background-image:linear-gradient(var(--grid) 1px, transparent 1px),linear-gradient(90deg, var(--grid) 1px, transparent 1px);
+  background-size:calc(var(--k)*2.5) calc(var(--k)*2.5);
+  opacity:0;visibility:hidden;transform:translateX(calc(var(--k)*2));transition:opacity .35s ease, transform .45s cubic-bezier(.2,.7,.2,1), visibility 0s .45s}
+.slide.active{opacity:1;visibility:visible;transform:none;transition:opacity .35s ease, transform .45s cubic-bezier(.2,.7,.2,1)}
+.slide.before{transform:translateX(calc(var(--k)*-2))}
+.slide .notes{display:none}
+.eyebrow{display:flex;align-items:center;gap:calc(var(--k)*1);font:700 calc(var(--k)*1.05)/1 var(--body);letter-spacing:.16em;text-transform:uppercase;color:var(--muted)}
+.eyebrow .dot{width:calc(var(--k)*.8);height:calc(var(--k)*.8);border-radius:50%;background:var(--slate)}
+.eyebrow.s .dot{background:var(--blue)} .eyebrow.a .dot{background:var(--orange)} .eyebrow.t .dot{background:var(--hl)}
+h2{margin:0;font:800 calc(var(--k)*3.5)/1.02 var(--display);letter-spacing:-.025em;text-wrap:balance;max-width:28ch}
+h2 .s{color:var(--blue-text)} h2 .a{color:var(--orange-text)}
+.lead{margin:0;font:400 calc(var(--k)*1.75)/1.35 var(--body);color:var(--muted);max-width:52ch}
+p,li{font:400 calc(var(--k)*1.5)/1.4 var(--body)}
+.body{flex:1;min-height:0;display:flex;flex-direction:column;justify-content:center;gap:calc(var(--k)*1.6)}
+.cols{display:grid;grid-template-columns:1fr 1fr;gap:calc(var(--k)*3);align-items:center}
+.cols > *{min-width:0}
+.hand{font:700 calc(var(--k)*2.4)/1 var(--hand);color:var(--ink)}
+.small{font:400 calc(var(--k)*1.2)/1.4 var(--body);color:var(--muted)}
+.cx{background:var(--hl);color:var(--hl-ink);border-radius:.22em;padding:0 .14em;box-decoration-break:clone;-webkit-box-decoration-break:clone}
+u.k{text-decoration:none;border-bottom:.12em solid currentColor;padding-bottom:.02em}
+
+/* ---------- blocos de montar ---------- */
+.blk{position:relative;display:inline-flex;align-items:center;white-space:nowrap;font:700 calc(var(--k)*1.9)/1 var(--display);letter-spacing:-.01em;padding:.85em 1.05em;border-radius:.34em}
+.blk.pri{background:var(--slate);color:var(--slate-ink);box-shadow:0 .2em 0 var(--slate-2)}
+.blk.sub{background:var(--blue);color:var(--blue-ink);box-shadow:0 .2em 0 var(--blue-2);padding-left:1.35em}
+.blk.sub::before{content:"";position:absolute;left:-.4em;top:50%;width:.82em;height:.82em;border-radius:50%;background:var(--blue);transform:translateY(-50%)}
+.blk.sock{-webkit-mask:radial-gradient(circle at 100% 50%, #0000 .47em, #000 .5em);mask:radial-gradient(circle at 100% 50%, #0000 .47em, #000 .5em);padding-right:1.2em}
+.tagw{display:inline-flex;filter:drop-shadow(0 .2em 0 var(--orange-2))}
+.tag{position:relative;display:inline-flex;align-items:center;white-space:nowrap;font:700 calc(var(--k)*1.9)/1 var(--display);letter-spacing:-.01em;background:var(--orange);color:var(--orange-ink);padding:.85em 1.05em .85em 1.7em;border-radius:0 .34em .34em 0;
+  clip-path:polygon(.95em 0,100% 0,100% 100%,.95em 100%,0 50%)}
+.tag::before{content:"";position:absolute;left:.62em;top:50%;width:.3em;height:.3em;border-radius:50%;background:var(--paper);transform:translateY(-50%)}
+.tag.r{padding:.85em 1.7em .85em 1.05em;border-radius:.34em 0 0 .34em;clip-path:polygon(0 0,calc(100% - .95em) 0,100% 50%,calc(100% - .95em) 100%,0 100%)}
+.tag.r::before{left:auto;right:.62em}
+.tag .cx,.tagw .cx{background:var(--hl-soft)}
+.duo{display:inline-flex;align-items:center;gap:0;flex-wrap:nowrap}
+.duo .blk.sub{margin-left:.06em}
+.sm .blk,.sm .tag{font-size:calc(var(--k)*1.45)}
+.lbl{display:inline-block;font:700 calc(var(--k)*1.05)/1.2 var(--body);letter-spacing:.08em;text-transform:uppercase;padding:.55em .9em;border-radius:999px;background:var(--panel);border:2px solid var(--line);color:var(--ink)}
+.lbl.s{border-color:var(--blue);color:var(--blue-text)} .lbl.a{border-color:var(--orange);color:var(--orange-text)}
+
+/* ---------- 1 capa ---------- */
+.cover{justify-content:center;gap:calc(var(--k)*2.2)}
+.cover h1{margin:0;font:800 calc(var(--k)*6.4)/.95 var(--display);letter-spacing:-.035em;text-wrap:balance}
+.cover h1 .s{color:var(--blue-text)} .cover h1 .a{color:var(--orange-text)} .cover h1 .x{font-weight:400;color:var(--muted)}
+.cover h1 small{display:block;font:700 calc(var(--k)*2.2)/1.1 var(--display);letter-spacing:-.01em;color:var(--muted);margin-bottom:calc(var(--k)*1)}
+.cover .rows{display:flex;gap:calc(var(--k)*3);flex-wrap:wrap;align-items:center;margin-top:calc(var(--k)*1)}
+.kbdhint{font:400 calc(var(--k)*1.1)/1.3 var(--body);color:var(--muted)}
+
+.cover{justify-content:space-between}
+.cover-grid{flex:1;display:grid;grid-template-columns:1.25fr 1fr;gap:calc(var(--k)*3);align-items:center}
+.cover-grid > *{min-width:0}
+.cover-main{display:flex;flex-direction:column;gap:calc(var(--k)*2)}
+.cover-art{display:flex;flex-direction:column;gap:calc(var(--k)*2.6);align-items:flex-end}
+.cover-art .duo:nth-child(1){transform:rotate(-3deg)} .cover-art .duo:nth-child(2){transform:rotate(2deg) translateX(calc(var(--k)*-1.5))}
+.credits{margin:0;display:grid;grid-template-columns:1.6fr .7fr 1.2fr .7fr;gap:calc(var(--k)*1.2);border-top:2px solid var(--ink);padding-top:calc(var(--k)*1.4)}
+.credits > div{min-width:0}
+.credits dt{font:700 calc(var(--k)*.95)/1 var(--body);letter-spacing:.16em;text-transform:uppercase;color:var(--muted);margin-bottom:calc(var(--k)*.6)}
+.credits dd{margin:0;font:700 calc(var(--k)*1.5)/1.25 var(--display);min-height:1.25em;border-radius:.2em;outline-offset:.2em;overflow-wrap:anywhere}
+.field:empty::before{content:attr(data-ph);color:var(--muted);opacity:.55;font-weight:400}
+.field:hover{background:var(--panel)}
+.thanks .body{align-items:flex-start;gap:calc(var(--k)*2.6)}
+.thanks-h{font-size:calc(var(--k)*6);max-width:16ch}
+.thanks-art{display:flex;gap:calc(var(--k)*3.5);flex-wrap:wrap;align-items:flex-start}
+.thanks-art .part{display:flex;flex-direction:column;gap:calc(var(--k)*1);align-items:flex-start}
+/* ---------- 2 pergunta ---------- */
+.versus{display:grid;grid-template-columns:1fr auto 1fr;gap:calc(var(--k)*2.5);align-items:center}
+.versus > *{min-width:0}
+.sentence{background:var(--panel);border:1px solid var(--line);border-radius:calc(var(--k)*1.2);padding:calc(var(--k)*2.4);font:700 calc(var(--k)*2.6)/1.2 var(--display);letter-spacing:-.015em;text-align:center;box-shadow:0 calc(var(--k)*1) calc(var(--k)*2.5) calc(var(--k)*-1.5) rgba(10,14,30,.35)}
+.versus .mid{font:700 calc(var(--k)*5)/1 var(--hand);color:var(--muted)}
+
+/* ---------- 3/4 diagramas ---------- */
+.flow{display:grid;grid-template-columns:repeat(3,1fr);gap:calc(var(--k)*2)}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:calc(var(--k)*1);padding:calc(var(--k)*1.8);display:flex;flex-direction:column;gap:calc(var(--k)*.9);min-width:0}
+.card h3{margin:0;font:800 calc(var(--k)*2)/1.05 var(--display);letter-spacing:-.015em}
+.card p{margin:0}
+.card .ex{font:400 calc(var(--k)*1.45)/1.35 var(--body)}
+.card.s{border-top:calc(var(--k)*.5) solid var(--blue)} .card.a{border-top:calc(var(--k)*.5) solid var(--orange)} .card.faded{opacity:.5}
+.card .sw{display:flex;flex-direction:column;gap:calc(var(--k)*.4);padding-top:calc(var(--k)*.8);border-top:1px dashed var(--line)}
+.arrow{font:700 calc(var(--k)*1.3)/1 var(--body);color:var(--muted);letter-spacing:.06em}
+.struct{display:flex;align-items:flex-end;gap:calc(var(--k)*3);flex-wrap:wrap}
+.struct .part{display:flex;flex-direction:column;gap:calc(var(--k)*1);align-items:flex-start}
+.def{display:grid;grid-template-columns:1fr 1fr;gap:calc(var(--k)*2)}
+
+/* ---------- 5 / 7 interativos ---------- */
+.lab{background:var(--panel);border:1px solid var(--line);border-radius:calc(var(--k)*1.2);padding:calc(var(--k)*2.2);display:flex;flex-direction:column;gap:calc(var(--k)*1.6);align-items:flex-start;min-width:0}
+.lab .stagebox{display:flex;align-items:center;min-height:calc(var(--k)*8);position:relative}
+.ghost{display:inline-flex;align-items:center;justify-content:center;font:700 calc(var(--k)*1.9)/1 var(--display);padding:.85em 1.05em;min-width:8.2em;border-radius:.34em;border:.12em dashed var(--blue);color:var(--blue-text);background:var(--blue-soft);margin-left:.06em}
+.ghost .hand{font-size:1.25em}
+.puzzle:not(.done) .fly{display:none}
+.puzzle.done .ghost{display:none}
+.puzzle.done .fly{animation:snap .7s cubic-bezier(.2,1.3,.4,1) both}
+@keyframes snap{from{transform:translate(3em,-2.2em) rotate(8deg);opacity:0}to{transform:none;opacity:1}}
+.puzzle.done .out-lbl{opacity:1}
+.out-lbl{opacity:0;transition:opacity .4s .5s}
+.chips{display:flex;flex-wrap:wrap;gap:calc(var(--k)*.8)}
+.chipbtn{border:2px solid var(--line);background:var(--paper);border-radius:999px;padding:calc(var(--k)*.7) calc(var(--k)*1.2);font:700 calc(var(--k)*1.2)/1 var(--body)}
+.chipbtn:hover{border-color:var(--orange)}
+.chipbtn[aria-pressed="true"]{background:var(--orange);border-color:var(--orange);color:var(--orange-ink)}
+.chipbtn.b:hover{border-color:var(--blue)} .chipbtn.b[aria-pressed="true"]{background:var(--blue);border-color:var(--blue);color:var(--blue-ink)}
+.cta{border:0;background:var(--blue);color:var(--blue-ink);border-radius:999px;padding:calc(var(--k)*.9) calc(var(--k)*1.6);font:700 calc(var(--k)*1.3)/1 var(--body)}
+.cta.ghostbtn{background:transparent;color:var(--ink);border:2px solid var(--line)}
+.facts{display:flex;flex-direction:column;gap:calc(var(--k)*1.1);margin:0;padding:0;list-style:none}
+.facts li{display:grid;grid-template-columns:calc(var(--k)*11) 1fr;gap:calc(var(--k)*1.2);align-items:baseline}
+.facts li > b{font:700 calc(var(--k)*1.05)/1.2 var(--body);letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+.facts li > span{font:400 calc(var(--k)*1.55)/1.35 var(--body)}
+.adv-stage{display:flex;align-items:center;flex-wrap:nowrap}
+.adv-stage .tagw{margin-right:.05em}
+.adv-out{font:700 calc(var(--k)*1.3)/1.3 var(--body)}
+.adv-out span{color:var(--orange-text)}
+
+/* ---------- grids de tipos ---------- */
+.types{display:grid;grid-template-columns:repeat(3,1fr);gap:calc(var(--k)*1.2)}
+.type{background:var(--panel);border:1px solid var(--line);border-radius:calc(var(--k)*.9);padding:calc(var(--k)*1.3) calc(var(--k)*1.5);display:flex;flex-direction:column;gap:calc(var(--k)*.5);min-width:0}
+.type .nm{font:800 calc(var(--k)*1.75)/1.05 var(--display);letter-spacing:-.01em}
+.type .fn{font:700 calc(var(--k)*1)/1.2 var(--body);letter-spacing:.12em;text-transform:uppercase}
+.type .ex{font:400 calc(var(--k)*1.4)/1.35 var(--body)}
+.types.s .fn{color:var(--blue-text)} .types.a .fn{color:var(--orange-text)}
+.types.s .ex u.k{border-color:var(--blue)} .types.a .ex u.k{border-color:var(--orange)}
+.types.nine{gap:calc(var(--k)*.9)}
+.types.nine .type{padding:calc(var(--k)*1) calc(var(--k)*1.3);gap:calc(var(--k)*.35)}
+.types.nine .nm{font-size:calc(var(--k)*1.5)}
+.types.nine .ex{font-size:calc(var(--k)*1.2)}
+
+/* ---------- testes ---------- */
+.testlab{display:grid;grid-template-columns:calc(var(--k)*26) 1fr;gap:calc(var(--k)*2.4);align-items:stretch}
+.testlab > *{min-width:0}
+.tbtns{display:flex;flex-direction:column;gap:calc(var(--k)*1)}
+.tbtn{display:flex;gap:calc(var(--k)*1.2);align-items:center;text-align:left;border:2px solid var(--line);background:var(--panel);border-radius:calc(var(--k)*1);padding:calc(var(--k)*1.2) calc(var(--k)*1.4);font:700 calc(var(--k)*1.5)/1.2 var(--body)}
+.tbtn .n{flex:none;display:grid;place-items:center;width:calc(var(--k)*3.2);height:calc(var(--k)*3.2);border-radius:50%;background:var(--hl);color:var(--hl-ink);font:800 calc(var(--k)*1.6)/1 var(--display)}
+.tbtn[aria-pressed="true"]{border-color:var(--ink);box-shadow:0 0 0 2px var(--ink) inset}
+.tres{display:flex;flex-direction:column;gap:calc(var(--k)*1.2)}
+.trow{background:var(--panel);border:1px solid var(--line);border-radius:calc(var(--k)*1);padding:calc(var(--k)*1.4) calc(var(--k)*1.8);display:flex;flex-direction:column;gap:calc(var(--k)*.6)}
+.trow.s{border-left:calc(var(--k)*.6) solid var(--blue)} .trow.a{border-left:calc(var(--k)*.6) solid var(--orange)}
+.trow .orig{font:400 calc(var(--k)*1.25)/1.3 var(--body);color:var(--muted)}
+.trow .res{font:700 calc(var(--k)*2)/1.2 var(--display);letter-spacing:-.01em}
+.trow .verdict{font:700 calc(var(--k)*1.25)/1.3 var(--body)}
+.ok{color:var(--green)} .bad{color:var(--red)}
+.tip{font:400 calc(var(--k)*1.2)/1.4 var(--body);color:var(--muted);border-top:1px dashed var(--line);padding-top:calc(var(--k)*1)}
+
+/* ---------- tabela ---------- */
+.tablewrap{overflow-x:auto}
+table.cmp{width:100%;border-collapse:separate;border-spacing:0;font:400 calc(var(--k)*1.35)/1.3 var(--body);background:var(--panel);border:1px solid var(--line);border-radius:calc(var(--k)*1);overflow:hidden}
+.cmp th,.cmp td{padding:calc(var(--k)*.85) calc(var(--k)*1.3);text-align:left;border-bottom:1px solid var(--line);vertical-align:top}
+.cmp tr:last-child td{border-bottom:0}
+.cmp thead th{font:800 calc(var(--k)*1.7)/1 var(--display)}
+.cmp thead th.s{color:var(--blue-ink);background:var(--blue)} .cmp thead th.a{color:var(--orange-ink);background:var(--orange)} .cmp thead th:first-child{background:var(--slate);color:var(--slate-ink)}
+.cmp tbody th{font:700 calc(var(--k)*1)/1.3 var(--body);letter-spacing:.12em;text-transform:uppercase;color:var(--muted);width:18%}
+
+/* ---------- pegadinhas ---------- */
+.traps{display:grid;grid-template-columns:calc(var(--k)*9) 1fr 1fr;gap:calc(var(--k)*1) calc(var(--k)*1.4);align-items:stretch}
+.traps > *{min-width:0}
+.traps .w{display:grid;place-items:center;font:800 calc(var(--k)*2.1)/1 var(--display);background:var(--hl);color:var(--hl-ink);border-radius:calc(var(--k)*.9)}
+.flipc{border:2px solid var(--line);background:var(--panel);border-radius:calc(var(--k)*.9);padding:calc(var(--k)*1) calc(var(--k)*1.4);text-align:left;display:flex;flex-direction:column;gap:calc(var(--k)*.4);justify-content:center}
+.flipc .q{font:700 calc(var(--k)*1.55)/1.25 var(--display)}
+.flipc .ans{font:700 calc(var(--k)*1.15)/1.3 var(--body);color:var(--muted)}
+.flipc.s.open{border-color:var(--blue);background:var(--blue-soft)} .flipc.s.open .ans{color:var(--blue-text)}
+.flipc.a.open{border-color:var(--orange);background:var(--orange-soft)} .flipc.a.open .ans{color:var(--orange-text)}
+
+/* ---------- questão ---------- */
+.exam{display:grid;grid-template-columns:1.05fr 1fr;gap:calc(var(--k)*2.6);align-items:start}
+.exam > *{min-width:0}
+.board{background:var(--slate);color:var(--slate-ink);border-radius:calc(var(--k)*1.1);padding:calc(var(--k)*2.4);box-shadow:0 calc(var(--k)*.4) 0 var(--slate-2)}
+.board .src{font:700 calc(var(--k)*1)/1 var(--body);letter-spacing:.16em;text-transform:uppercase;opacity:.75;margin-bottom:calc(var(--k)*1.2)}
+.board blockquote{margin:0;font:700 calc(var(--k)*2.15)/1.3 var(--display);letter-spacing:-.01em}
+.board .enun{margin:calc(var(--k)*1.4) 0 0;font:400 calc(var(--k)*1.45)/1.35 var(--body)}
+.alts{display:flex;flex-direction:column;gap:calc(var(--k)*.8)}
+.alt{display:flex;justify-content:space-between;gap:calc(var(--k)*1);align-items:center;text-align:left;border:2px solid var(--line);background:var(--panel);border-radius:calc(var(--k)*.8);padding:calc(var(--k)*.95) calc(var(--k)*1.3);font:400 calc(var(--k)*1.4)/1.25 var(--body)}
+.alt b{margin-right:.4em}
+.alt .fb{font:700 calc(var(--k)*1.7)/1 var(--hand);white-space:nowrap}
+.alt.right{border-color:var(--green);background:var(--green-soft)} .alt.right .fb{color:var(--green)}
+.alt.wrong{border-color:var(--red);background:var(--red-soft)} .alt.wrong .fb{color:var(--red)}
+.explain{font:400 calc(var(--k)*1.3)/1.4 var(--body);background:var(--panel);border:1px solid var(--line);border-radius:calc(var(--k)*.8);padding:calc(var(--k)*1.1) calc(var(--k)*1.4)}
+.explain b{font-weight:700}
+
+/* ---------- quiz ---------- */
+.quiz{display:grid;grid-template-columns:1fr 1fr;gap:calc(var(--k)*1) calc(var(--k)*1.6)}
+.qi{background:var(--panel);border:2px solid var(--line);border-radius:calc(var(--k)*.9);padding:calc(var(--k)*1.1) calc(var(--k)*1.4);display:flex;flex-direction:column;gap:calc(var(--k)*.7);min-width:0}
+.qi .q{font:700 calc(var(--k)*1.6)/1.25 var(--display)}
+.qi .opts{display:flex;gap:calc(var(--k)*.7);flex-wrap:wrap;align-items:center}
+.qi .fb{font:700 calc(var(--k)*1.15)/1.3 var(--body)}
+.qi.good{border-color:var(--green)} .qi.miss{border-color:var(--red)}
+.score{font:700 calc(var(--k)*1.4)/1 var(--body);color:var(--muted)}
+
+/* ---------- vídeo ---------- */
+.videobox{flex:1;min-height:0;display:grid;place-items:center}
+.videobox video{max-width:100%;max-height:100%;width:auto;height:100%;aspect-ratio:16/9;border-radius:calc(var(--k)*1);background:#0D1120;box-shadow:0 calc(var(--k)*1) calc(var(--k)*3) calc(var(--k)*-1.5) rgba(10,14,30,.55)}
+
+/* ---------- resumo ---------- */
+.final{display:grid;grid-template-columns:1.3fr 1fr;gap:calc(var(--k)*3);align-items:start}
+.final > *{min-width:0}
+.big{font:800 calc(var(--k)*3.6)/1.05 var(--display);letter-spacing:-.025em;margin:0}
+.big .s{color:var(--blue-text)} .big .a{color:var(--orange-text)}
+.refs{margin:0;padding-left:1.2em}
+.refs li{font:400 calc(var(--k)*1.2)/1.45 var(--body);color:var(--muted)}
+.threetests{display:flex;gap:calc(var(--k)*1);flex-wrap:wrap}
+.threetests span{font:700 calc(var(--k)*1.3)/1.2 var(--body);background:var(--panel);border:1px solid var(--line);border-radius:999px;padding:calc(var(--k)*.7) calc(var(--k)*1.2)}
+.threetests i{font-style:normal;display:inline-grid;place-items:center;width:1.6em;height:1.6em;border-radius:50%;background:var(--hl);color:var(--hl-ink);margin-right:.4em}
+
+/* ---------- celular: slides empilhados ---------- */
+@media (max-width: 760px){
+  .app{display:block;height:auto;padding-block:16px 32px}
+  .stage{width:100%;aspect-ratio:auto;container-type:normal;overflow:visible;box-shadow:none;background:transparent;border-radius:0}
+  .progress,.bar{display:none}
+  .slide{--k:7px;position:relative;inset:auto;opacity:1;visibility:visible;transform:none;transition:none;border-radius:14px;border:1px solid var(--line);margin-bottom:16px;padding:28px 18px;gap:16px;overflow:hidden}
+  p,li,.lead,.facts li > span,.card .ex,.type .ex,.trow .orig,.tip,.explain,.alt,.small,.refs li,.kbdhint,.cmp,.qi .fb,.flipc .ans,.adv-out,.trow .verdict{font-size:max(15px, 1em) !important}
+  .lead{font-size:18px !important}
+  .cols,.def,.flow,.types,.testlab,.exam,.quiz,.final,.versus{grid-template-columns:1fr}
+  .traps{grid-template-columns:1fr}
+  .versus .mid{text-align:center}
+  .blk,.tag,.ghost{font-size:18px}
+  .sm .blk,.sm .tag{font-size:15px}
+  .duo,.adv-stage{flex-wrap:wrap;row-gap:10px}
+  .blk,.tag{white-space:normal}
+  .cover h1{font-size:44px}
+  .cover-grid,.credits{grid-template-columns:1fr}
+  .cover-art{align-items:flex-start}
+  .credits dd{font-size:18px}
+  .thanks-h{font-size:38px}
+  .videobox video{height:auto;width:100%}
+  .facts li{grid-template-columns:1fr}
+  .notes-panel{display:none !important}
+}
+@media (prefers-reduced-motion: reduce){.slide,.fly,.out-lbl,.progress{transition:none !important;animation:none !important}}
+</style>
+<style>:root{color-scheme:light;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}[hidden]{display:none!important}img{max-width:100%}</style>
+</head>
+<body>
+<div class="app" id="app">
+  <div class="viewport">
+    <div class="stage" id="stage">
+      <div class="progress" id="progress"></div>
+
+      <!-- 1 -->
+      <section class="slide cover" data-title="Capa">
+        <div class="cover-grid">
+          <div class="cover-main">
+            <div class="eyebrow"><span class="dot"></span>Língua Portuguesa · Sintaxe do período composto</div>
+            <h1><small>Oração subordinada</small><span class="s">Substantiva</span> <span class="x">×</span> <span class="a">Adverbial</span></h1>
+            <p class="lead">O que cada uma é, como ela funciona dentro da frase e como diferenciar as duas na hora da prova.</p>
+          </div>
+          <div class="cover-art" aria-hidden="true">
+            <span class="duo"><span class="blk pri sock">Espero</span><span class="blk sub"><span class="cx">que</span>&nbsp;você venha</span></span>
+            <span class="duo"><span class="tagw"><span class="tag"><span class="cx">Como</span>&nbsp;choveu,</span></span><span class="blk pri">o jogo foi adiado.</span></span>
+          </div>
+        </div>
+        <dl class="credits">
+          <div><dt>Apresentação</dt><dd class="field" contenteditable="true" spellcheck="false" data-key="nomes" data-ph="Clique e escreva os nomes"></dd></div>
+          <div><dt>Turma</dt><dd class="field" contenteditable="true" spellcheck="false" data-key="turma" data-ph="Turma"></dd></div>
+          <div><dt>Professor(a)</dt><dd class="field" contenteditable="true" spellcheck="false" data-key="prof" data-ph="Nome do(a) professor(a)"></dd></div>
+          <div><dt>Data</dt><dd class="field" contenteditable="true" spellcheck="false" data-key="data" data-ph="Data"></dd></div>
+        </dl>
+        <p class="kbdhint">Setas ← → mudam de slide · N mostra as notas de fala · F deixa em tela cheia</p>
+        <div class="notes">Apresente o grupo e o tema. Explique o código de cores que aparece em toda a apresentação: azul é a substantiva, a peça de quebra-cabeça que completa a frase. Laranja é a adverbial, a etiqueta que acrescenta uma circunstância.</div>
+      </section>
+
+      <!-- 2 -->
+      <section class="slide" data-title="A pergunta">
+        <div class="eyebrow t"><span class="dot"></span>Para começar</div>
+        <h2>Mesmo “se”. Por que essas orações são diferentes?</h2>
+        <div class="body">
+          <div class="versus">
+            <div class="sentence">Não sei <span class="cx">se</span> ele vem.</div>
+            <div class="mid">?</div>
+            <div class="sentence"><span class="cx">Se</span> ele vem, eu fico.</div>
+          </div>
+          <p class="lead">As duas frases usam a mesma palavra, mas as orações exercem funções diferentes. No fim da apresentação você vai saber explicar por quê.</p>
+        </div>
+        <div class="notes">Leia as duas frases em voz alta e pergunte para a turma se elas são iguais. Não responda agora: a resposta volta no slide das pegadinhas.</div>
+      </section>
+
+      <!-- 3 -->
+      <section class="slide" data-title="Período composto">
+        <div class="eyebrow"><span class="dot"></span>Base</div>
+        <h2>No período composto por subordinação, uma oração depende da outra</h2>
+        <div class="body">
+          <div class="struct">
+            <div class="part"><span class="blk pri sock">Espero</span><span class="lbl">Oração principal</span></div>
+            <div class="part"><span class="blk sub"><span class="cx">que</span>&nbsp;você venha</span><span class="lbl s">Oração subordinada</span></div>
+          </div>
+          <div class="def">
+            <div class="card"><h3>Oração principal</h3><p>Comanda o período. É nela que a outra oração se encaixa.</p></div>
+            <div class="card"><h3>Oração subordinada</h3><p>Depende da principal e exerce uma <b>função sintática</b> dentro dela, como sujeito, objeto ou adjunto adverbial.</p></div>
+          </div>
+        </div>
+        <div class="notes">A palavra-chave é função sintática. A subordinada não é solta: ela ocupa um lugar dentro da principal. O nome dela depende do papel que ocupa.</div>
+      </section>
+
+      <!-- 4 -->
+      <section class="slide" data-title="A grande ideia">
+        <div class="eyebrow"><span class="dot"></span>A grande ideia</div>
+        <h2>A oração subordinada faz o papel de uma palavra</h2>
+        <div class="body">
+          <div class="flow">
+            <div class="card s"><h3>Substantiva</h3><p>Funciona como um <b>substantivo</b>.</p>
+              <div class="sw"><span class="ex">Espero <u class="k">sua vinda</u>.</span><span class="arrow">↓ vira oração</span><span class="ex">Espero <u class="k">que você venha</u>.</span></div></div>
+            <div class="card faded"><h3>Adjetiva</h3><p>Funciona como um <b>adjetivo</b>. Não é o tema de hoje.</p>
+              <div class="sw"><span class="ex">Li um livro <u class="k">ótimo</u>.</span><span class="arrow">↓ vira oração</span><span class="ex">Li um livro <u class="k">que me emocionou</u>.</span></div></div>
+            <div class="card a"><h3>Adverbial</h3><p>Funciona como um <b>advérbio</b>.</p>
+              <div class="sw"><span class="ex">Saí <u class="k">cedo</u>.</span><span class="arrow">↓ vira oração</span><span class="ex">Saí <u class="k">quando amanheceu</u>.</span></div></div>
+          </div>
+        </div>
+        <div class="notes">Esse é o segredo de tudo: a oração imita uma palavra. Se ela ocupa o lugar de um substantivo, é substantiva. Se ocupa o lugar de um advérbio, é adverbial. A adjetiva fica para outra aula.</div>
+      </section>
+
+      <!-- 5 -->
+      <section class="slide" data-title="Substantiva">
+        <div class="eyebrow s"><span class="dot"></span>Oração subordinada substantiva</div>
+        <h2>A <span class="s">substantiva</span> é a peça que completa a principal</h2>
+        <div class="body">
+          <div class="cols">
+            <ul class="facts">
+              <li><b>Função</b><span>A de um substantivo: sujeito, objeto direto, objeto indireto, complemento nominal, predicativo ou aposto.</span></li>
+              <li><b>Conectivos</b><span>Conjunções integrantes <span class="cx">que</span> e <span class="cx">se</span>. Também <i>quem, qual, onde, como, quando, por que</i> nas perguntas indiretas.</span></li>
+              <li><b>Sem ela</b><span>A principal fica <b>incompleta</b>.</span></li>
+            </ul>
+            <div class="lab puzzle" id="puzzle">
+              <div class="stagebox">
+                <span class="duo"><span class="blk pri sock">Espero</span><span class="ghost"><span class="hand">o quê?</span></span><span class="blk sub fly"><span class="cx">que</span>&nbsp;você venha</span></span>
+              </div>
+              <span class="lbl s out-lbl">Objeto direto de “espero”</span>
+              <button class="cta" id="puzzleBtn" type="button">Encaixar a subordinada</button>
+            </div>
+          </div>
+        </div>
+        <div class="notes">Mostre o “Espero” sozinho e pergunte: espero o quê? Depois clique em “Encaixar”. A subordinada é exatamente a resposta que faltava, e por isso é o objeto direto do verbo.</div>
+      </section>
+
+      <!-- 6 -->
+      <section class="slide" data-title="6 tipos de substantivas">
+        <div class="eyebrow s"><span class="dot"></span>Oração subordinada substantiva</div>
+        <h2>Os 6 tipos, conforme a função que ela exerce</h2>
+        <div class="body">
+          <div class="types s">
+            <div class="type"><span class="fn">Sujeito</span><span class="nm">Subjetiva</span><span class="ex">É necessário <u class="k">que você estude</u>.</span></div>
+            <div class="type"><span class="fn">Objeto direto</span><span class="nm">Objetiva direta</span><span class="ex">Espero <u class="k">que você venha</u>.</span></div>
+            <div class="type"><span class="fn">Objeto indireto</span><span class="nm">Objetiva indireta</span><span class="ex">Ele se lembrou <u class="k">de que tinha prova</u>.</span></div>
+            <div class="type"><span class="fn">Complemento nominal</span><span class="nm">Completiva nominal</span><span class="ex">Tenho certeza <u class="k">de que ele virá</u>.</span></div>
+            <div class="type"><span class="fn">Predicativo</span><span class="nm">Predicativa</span><span class="ex">O problema é <u class="k">que ninguém estudou</u>.</span></div>
+            <div class="type"><span class="fn">Aposto</span><span class="nm">Apositiva</span><span class="ex">Só quero isto: <u class="k">que você seja feliz</u>.</span></div>
+          </div>
+          <p class="small">Dica: a subjetiva costuma aparecer depois de expressões como <i>é bom, é necessário, convém, parece, sabe-se</i>.</p>
+        </div>
+        <div class="notes">Não precisa decorar a tabela agora. O nome de cada tipo é só o nome da função: se é sujeito, é subjetiva; se é objeto direto, é objetiva direta. Destaque a dica da subjetiva, que cai muito.</div>
+      </section>
+
+      <!-- 7 -->
+      <section class="slide" data-title="Adverbial">
+        <div class="eyebrow a"><span class="dot"></span>Oração subordinada adverbial</div>
+        <h2>A <span class="a">adverbial</span> é uma etiqueta: acrescenta uma circunstância</h2>
+        <div class="body">
+          <div class="cols">
+            <ul class="facts">
+              <li><b>Função</b><span>A de um advérbio: <b>adjunto adverbial</b> da oração principal.</span></li>
+              <li><b>Conectivos</b><span>Conjunções subordinativas adverbiais: <span class="cx">quando</span>, <span class="cx">porque</span>, <span class="cx">embora</span>, <span class="cx">para que</span>…</span></li>
+              <li><b>Sem ela</b><span>A principal continua <b>completa</b>. Só perde a circunstância.</span></li>
+            </ul>
+            <div class="lab">
+              <div class="adv-stage sm" id="advStage"><span class="tagw"><span class="tag" id="advTag"><span class="cx">Como</span>&nbsp;choveu,</span></span><span class="blk pri">o jogo foi adiado.</span></div>
+              <div class="adv-out" id="advOut">Circunstância: <span>causa</span> · oração adverbial <span>causal</span></div>
+              <div class="chips" id="advChips" role="group" aria-label="Escolha a etiqueta">
+                <button class="chipbtn" type="button" aria-pressed="true" data-i="0">causa</button>
+                <button class="chipbtn" type="button" aria-pressed="false" data-i="1">tempo</button>
+                <button class="chipbtn" type="button" aria-pressed="false" data-i="2">concessão</button>
+                <button class="chipbtn" type="button" aria-pressed="false" data-i="3">finalidade</button>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="notes">A frase “o jogo foi adiado” já está completa. Troque as etiquetas e mostre que a principal não muda: só muda a circunstância. Pergunte à turma se ela responde por quê, quando, apesar de quê ou para quê.</div>
+      </section>
+
+      <!-- 8 -->
+      <section class="slide" data-title="9 tipos de adverbiais">
+        <div class="eyebrow a"><span class="dot"></span>Oração subordinada adverbial</div>
+        <h2>Os 9 tipos, conforme a circunstância</h2>
+        <div class="body">
+          <div class="types a nine">
+            <div class="type"><span class="nm">Causal</span><span class="fn">porque · como · já que</span><span class="ex"><u class="k">Como choveu</u>, o jogo foi adiado.</span></div>
+            <div class="type"><span class="nm">Consecutiva</span><span class="fn">tão/tanto… que</span><span class="ex">Falou tanto <u class="k">que ficou rouco</u>.</span></div>
+            <div class="type"><span class="nm">Condicional</span><span class="fn">se · caso · desde que</span><span class="ex"><u class="k">Se estudar</u>, passará.</span></div>
+            <div class="type"><span class="nm">Concessiva</span><span class="fn">embora · ainda que</span><span class="ex"><u class="k">Embora estivesse cansado</u>, foi à aula.</span></div>
+            <div class="type"><span class="nm">Comparativa</span><span class="fn">como · mais… do que</span><span class="ex">Ele é mais alto <u class="k">do que o irmão</u>.</span></div>
+            <div class="type"><span class="nm">Conformativa</span><span class="fn">conforme · segundo</span><span class="ex">Fiz <u class="k">conforme o professor pediu</u>.</span></div>
+            <div class="type"><span class="nm">Final</span><span class="fn">para que · a fim de que</span><span class="ex">Estudou <u class="k">para que pudesse passar</u>.</span></div>
+            <div class="type"><span class="nm">Proporcional</span><span class="fn">à medida que</span><span class="ex"><u class="k">À medida que lia</u>, aprendia mais.</span></div>
+            <div class="type"><span class="nm">Temporal</span><span class="fn">quando · enquanto · assim que</span><span class="ex"><u class="k">Quando cheguei</u>, todos tinham saído.</span></div>
+          </div>
+        </div>
+        <div class="notes">A conjunção é a pista do tipo. Atenção ao “desde que”: é temporal quando significa “a partir do momento em que” e condicional quando significa “contanto que”.</div>
+      </section>
+
+      <!-- 9 -->
+      <section class="slide" data-title="Os 3 testes">
+        <div class="eyebrow t"><span class="dot"></span>Como diferenciar</div>
+        <h2>Três testes rápidos para não errar</h2>
+        <div class="body">
+          <div class="testlab">
+            <div class="tbtns" role="group" aria-label="Escolha o teste">
+              <button class="tbtn" type="button" aria-pressed="true" data-t="0"><span class="n">1</span>Troque por “isso”</button>
+              <button class="tbtn" type="button" aria-pressed="false" data-t="1"><span class="n">2</span>Que pergunta ela responde?</button>
+              <button class="tbtn" type="button" aria-pressed="false" data-t="2"><span class="n">3</span>Retire a oração</button>
+            </div>
+            <div class="tres">
+              <div class="trow s"><span class="orig">Espero que você venha.</span><span class="res" id="tS"></span><span class="verdict" id="vS"></span></div>
+              <div class="trow a"><span class="orig">Como choveu, o jogo foi adiado.</span><span class="res" id="tA"></span><span class="verdict" id="vA"></span></div>
+              <p class="tip">Extra: a adverbial que vem antes da principal costuma ser separada por vírgula e pode mudar de lugar. A substantiva não se separa do verbo por vírgula, exceto a apositiva.</p>
+            </div>
+          </div>
+        </div>
+        <div class="notes">Clique em cada teste e compare as duas frases. O teste do “isso” é o mais rápido. O da retirada é o mais visual: se a frase fica incompleta, era substantiva.</div>
+      </section>
+
+      <!-- 10 -->
+      <section class="slide" data-title="Comparação">
+        <div class="eyebrow t"><span class="dot"></span>Como diferenciar</div>
+        <h2>Lado a lado</h2>
+        <div class="body">
+          <div class="tablewrap">
+            <table class="cmp">
+              <thead><tr><th></th><th class="s">Substantiva</th><th class="a">Adverbial</th></tr></thead>
+              <tbody>
+                <tr><th>Faz o papel de</th><td>Substantivo</td><td>Advérbio</td></tr>
+                <tr><th>Equivale a</th><td>“isso”</td><td>um advérbio (“nesse caso”, “por isso”, “então”)</td></tr>
+                <tr><th>Responde</th><td>o quê? / de quê?</td><td>quando? por quê? em que condição? para quê?</td></tr>
+                <tr><th>Se retirar</th><td>A principal fica incompleta</td><td>A principal continua completa</td></tr>
+                <tr><th>Conectivos</th><td>que, se (integrantes)</td><td>quando, porque, embora, se, para que…</td></tr>
+                <tr><th>Tipos</th><td>6</td><td>9</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <div class="notes">Use esta tabela como resumo de bolso. Se a turma tirar foto de um slide, que seja este.</div>
+      </section>
+
+      <!-- 11 -->
+      <section class="slide" data-title="Pegadinhas">
+        <div class="eyebrow t"><span class="dot"></span>Pegadinhas</div>
+        <h2>A mesma palavra pode abrir os dois tipos</h2>
+        <div class="body">
+          <div class="traps" id="traps">
+            <div class="w">QUE</div>
+            <button class="flipc s" type="button"><span class="q">Ele disse <span class="cx">que</span> estava cansado.</span><span class="ans">Toque para revelar</span></button>
+            <button class="flipc a" type="button"><span class="q">Estava tão cansado <span class="cx">que</span> dormiu.</span><span class="ans">Toque para revelar</span></button>
+            <div class="w">SE</div>
+            <button class="flipc s" type="button"><span class="q">Não sei <span class="cx">se</span> ele vem.</span><span class="ans">Toque para revelar</span></button>
+            <button class="flipc a" type="button"><span class="q"><span class="cx">Se</span> ele vier, sairemos.</span><span class="ans">Toque para revelar</span></button>
+            <div class="w">QUANDO</div>
+            <button class="flipc s" type="button"><span class="q">Não sei <span class="cx">quando</span> ele chega.</span><span class="ans">Toque para revelar</span></button>
+            <button class="flipc a" type="button"><span class="q"><span class="cx">Quando</span> ele chegar, sairemos.</span><span class="ans">Toque para revelar</span></button>
+            <div class="w">COMO</div>
+            <button class="flipc s" type="button"><span class="q">Não sei <span class="cx">como</span> ele fez isso.</span><span class="ans">Toque para revelar</span></button>
+            <button class="flipc a" type="button"><span class="q"><span class="cx">Como</span> estava doente, faltou.</span><span class="ans">Toque para revelar</span></button>
+          </div>
+          <div><button class="cta ghostbtn" type="button" id="revealAll">Revelar todas</button></div>
+        </div>
+        <div class="notes">Antes de revelar cada cartão, peça para a turma aplicar o teste do “isso”. “Não sei se ele vem” vira “não sei isso”, então é substantiva. Isso também responde a pergunta do slide 2.</div>
+      </section>
+
+      <!-- 12 -->
+      <section class="slide" data-title="Cuidados extras">
+        <div class="eyebrow t"><span class="dot"></span>Cuidados extras</div>
+        <h2>Duas situações que confundem</h2>
+        <div class="body">
+          <div class="def">
+            <div class="card"><h3>O “que” relativo</h3>
+              <p>Em <i>“O livro <u class="k">que comprei</u> é ótimo”</i>, o <span class="cx">que</span> retoma a palavra “livro”. Ele é pronome relativo e a oração é <b>adjetiva</b>.</p>
+              <p class="small">Teste: se der para trocar o “que” por “o qual”, ele é relativo.</p></div>
+            <div class="card"><h3>Orações reduzidas</h3>
+              <p>Aparecem sem conectivo, com o verbo no infinitivo, gerúndio ou particípio.</p>
+              <p><span class="lbl s">Substantiva</span> É importante <u class="k">estudar todo dia</u>.</p>
+              <p><span class="lbl a">Adverbial</span> <u class="k">Ao chegar em casa</u>, ligou para a mãe.</p>
+              <p><span class="lbl a">Adverbial</span> <u class="k">Terminada a aula</u>, saímos.</p></div>
+          </div>
+        </div>
+        <div class="notes">O “que” relativo é a armadilha mais comum: ele introduz adjetiva, não substantiva. Nas reduzidas, os testes continuam funcionando: “é importante isso” mostra que “estudar todo dia” é substantiva.</div>
+      </section>
+
+      <!-- 13 -->
+      <section class="slide" data-title="Questão Fuvest">
+        <div class="eyebrow t"><span class="dot"></span>Na prova</div>
+        <h2>Questão de vestibular: Fuvest</h2>
+        <div class="body">
+          <div class="exam">
+            <div class="board">
+              <div class="src">Fuvest</div>
+              <blockquote>“Era tal a serenidade da tarde, que se percebia o sino de uma freguesia distante, dobrando a finados.”</blockquote>
+              <p class="enun">No período acima, a segunda oração é:</p>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:calc(var(--k)*1)">
+              <div class="alts" id="alts">
+                <button class="alt" type="button" data-ok="0"><span><b>a)</b>subordinada adverbial causal</span><span class="fb"></span></button>
+                <button class="alt" type="button" data-ok="1"><span><b>b)</b>subordinada adverbial consecutiva</span><span class="fb"></span></button>
+                <button class="alt" type="button" data-ok="0"><span><b>c)</b>subordinada adverbial concessiva</span><span class="fb"></span></button>
+                <button class="alt" type="button" data-ok="0"><span><b>d)</b>subordinada adverbial comparativa</span><span class="fb"></span></button>
+                <button class="alt" type="button" data-ok="0" data-trap="1"><span><b>e)</b>subordinada adverbial subjetiva</span><span class="fb"></span></button>
+              </div>
+              <div class="explain" id="explain" hidden><b>Resposta: b.</b> O par <span class="cx">tal … que</span> indica consequência: a tarde era tão serena que, como resultado, se ouvia o sino. A alternativa “e” é armadilha, porque “subjetiva” é um tipo de <b>substantiva</b>. Compare: em “Percebia-se <u class="k">que o sino dobrava</u>”, a oração é sujeito, então é substantiva subjetiva.</div>
+            </div>
+          </div>
+        </div>
+        <div class="notes">Deixe a turma votar antes de clicar. A pista é o “tal” na primeira oração, que pede o “que” consecutivo. Em algumas reproduções desta questão, a alternativa “e” aparece como “subordinada substantiva subjetiva”; em qualquer versão, a resposta é a letra b.</div>
+      </section>
+
+      <!-- 14 -->
+      <section class="slide" data-title="Quiz relâmpago">
+        <div class="eyebrow t"><span class="dot"></span>Na prova</div>
+        <h2>Quiz relâmpago: substantiva ou adverbial?</h2>
+        <div class="body">
+          <div class="quiz" id="quiz"></div>
+          <div class="score" id="score" aria-live="polite">0 de 6 respondidas</div>
+        </div>
+        <div class="notes">Faça em voz alta: leia a frase, a turma responde, e você clica. Peça que justifiquem com um dos três testes.</div>
+      </section>
+
+      <!-- 15 -->
+      <section class="slide" data-title="Revisão em vídeo">
+        <div class="eyebrow"><span class="dot"></span>Revisão em 1 minuto</div>
+        <h2>Tudo o que vimos, em movimento</h2>
+        <div class="videobox">
+          <video id="vid" src="video.mp4" poster="poster.jpg" controls playsinline preload="metadata"></video>
+        </div>
+        <div class="notes">O vídeo não tem som: comente cada cena enquanto ele passa. Ele revisa a peça que completa, a etiqueta de circunstância, os testes, a pegadinha do “que” e a questão da Fuvest.</div>
+      </section>
+
+      <!-- 16 -->
+      <section class="slide" data-title="Resumo">
+        <div class="eyebrow"><span class="dot"></span>Para levar</div>
+        <div class="body">
+          <div class="final">
+            <div style="display:flex;flex-direction:column;gap:calc(var(--k)*2)">
+              <p class="big">A <span class="s">substantiva completa</span>.<br>A <span class="a">adverbial acrescenta uma circunstância</span>.</p>
+              <div class="threetests"><span><i>1</i>Troque por “isso”</span><span><i>2</i>Que pergunta responde?</span><span><i>3</i>Retire e veja o que sobra</span></div>
+            </div>
+            <div class="card"><h3>Referências</h3>
+              <ol class="refs">
+                <li>BECHARA, Evanildo. <i>Moderna Gramática Portuguesa</i>.</li>
+                <li>CUNHA, Celso; CINTRA, Lindley. <i>Nova Gramática do Português Contemporâneo</i>.</li>
+                <li>CEGALLA, Domingos Paschoal. <i>Novíssima Gramática da Língua Portuguesa</i>.</li>
+                <li>Nomenclatura Gramatical Brasileira (NGB), 1959.</li>
+                <li>Questão: Fuvest, conforme reproduzida em bancos de exercícios.</li>
+              </ol></div>
+          </div>
+        </div>
+        <div class="notes">Feche com a frase-síntese e os três testes. Agradeça e abra para perguntas.</div>
+      </section>
+      <!-- 17 -->
+      <section class="slide thanks" data-title="Agradecimento">
+        <div class="eyebrow"><span class="dot"></span>Fim</div>
+        <div class="body">
+          <h2 class="thanks-h">Agradecemos a atenção de todos!</h2>
+          <div class="thanks-art">
+            <div class="part"><span class="duo"><span class="blk pri sock">Agradecemos</span><span class="blk sub">a atenção de todos!</span></span><span class="lbl s">objeto direto: o papel de um substantivo</span></div>
+            <div class="part"><span class="duo"><span class="tagw"><span class="tag"><span class="cx">Se</span>&nbsp;tiverem dúvidas,</span></span><span class="blk pri">perguntem!</span></span><span class="lbl a">oração adverbial condicional</span></div>
+          </div>
+          <p class="lead" id="thanksNames"></p>
+        </div>
+        <div class="notes">Agradeça e abra para perguntas. Se der tempo, brinque com a turma: “a atenção de todos” completa o verbo, como uma substantiva faria, e “se tiverem dúvidas” é uma adverbial condicional.</div>
+      </section>
+    </div>
+  </div>
+  <div>
+    <div class="bar">
+      <button class="btn nav" type="button" id="prev" aria-label="Slide anterior">‹</button>
+      <span class="count" id="count"></span>
+      <button class="btn nav" type="button" id="next" aria-label="Próximo slide">›</button>
+      <button class="btn" type="button" id="notesBtn" aria-pressed="false">Notas <kbd>N</kbd></button>
+      <button class="btn" type="button" id="fsBtn">Tela cheia <kbd>F</kbd></button>
+    </div>
+    <div class="notes-panel" id="notesPanel" aria-live="polite"></div>
+  </div>
+</div>
+
+<script>
+(() => {
+  const slides = [...document.querySelectorAll('.slide')];
+  const app = document.getElementById('app');
+  const count = document.getElementById('count');
+  const progress = document.getElementById('progress');
+  const notesPanel = document.getElementById('notesPanel');
+  const wide = matchMedia('(min-width: 761px)');
+  let cur = 0;
+
+  function fromHash() {
+    const m = /^#slide-(\d+)$/.exec(location.hash);
+    return m ? Math.min(slides.length - 1, Math.max(0, +m[1] - 1)) : 0;
+  }
+  function show(i, push = true) {
+    cur = Math.min(slides.length - 1, Math.max(0, i));
+    slides.forEach((s, j) => {
+      s.classList.toggle('active', j === cur);
+      s.classList.toggle('before', j < cur);
+      if (wide.matches) s.inert = j !== cur; else s.inert = false;
+    });
+    count.innerHTML = `<b>${cur + 1}</b> / ${slides.length} · ${slides[cur].dataset.title}`;
+    progress.style.width = ((cur + 1) / slides.length * 100) + '%';
+    const n = slides[cur].querySelector('.notes');
+    notesPanel.innerHTML = `<strong>Notas de fala · slide ${cur + 1}</strong>${n ? n.innerHTML : ''}`;
+    const v = document.getElementById('vid');
+    if (v && slides[cur] !== v.closest('.slide') && !v.paused) v.pause();
+    if (push && wide.matches) { try { history.replaceState(null, '', '#slide-' + (cur + 1)); } catch (e) {} }
+  }
+  document.getElementById('prev').onclick = () => show(cur - 1);
+  document.getElementById('next').onclick = () => show(cur + 1);
+  const notesBtn = document.getElementById('notesBtn');
+  function toggleNotes() {
+    const on = !app.classList.contains('show-notes');
+    app.classList.toggle('show-notes', on); notesBtn.setAttribute('aria-pressed', on);
+  }
+  notesBtn.onclick = toggleNotes;
+  function fullscreen() {
+    try {
+      if (document.fullscreenElement) document.exitFullscreen();
+      else (document.documentElement.requestFullscreen?.() || Promise.resolve()).catch(() => {});
+    } catch (e) {}
+  }
+  document.getElementById('fsBtn').onclick = fullscreen;
+  document.addEventListener('keydown', e => {
+    if (!wide.matches || e.altKey || e.ctrlKey || e.metaKey) return;
+    if (e.target.closest && e.target.closest('video')) return;
+    if (e.target.isContentEditable) return;
+    const k = e.key;
+    if (k === 'ArrowRight' || k === 'PageDown') { e.preventDefault(); show(cur + 1); }
+    else if (k === 'ArrowLeft' || k === 'PageUp') { e.preventDefault(); show(cur - 1); }
+    else if (k === ' ' && !(e.target.closest && e.target.closest('button'))) { e.preventDefault(); show(cur + (e.shiftKey ? -1 : 1)); }
+    else if (k === 'Home') show(0);
+    else if (k === 'End') show(slides.length - 1);
+    else if (k === 'n' || k === 'N') toggleNotes();
+    else if (k === 'f' || k === 'F') fullscreen();
+  });
+  addEventListener('hashchange', () => show(fromHash(), false));
+  wide.addEventListener('change', () => show(cur, false));
+
+  // 5 — quebra-cabeça
+  const pz = document.getElementById('puzzle'), pzb = document.getElementById('puzzleBtn');
+  pzb.onclick = () => { const d = pz.classList.toggle('done'); pzb.textContent = d ? 'Tirar a peça' : 'Encaixar a subordinada'; };
+
+  // 7 — etiquetas adverbiais
+  const ADV = [
+    ['<span class="cx">Como</span>&nbsp;choveu,', 'causa', 'causal'],
+    ['<span class="cx">Assim que</span>&nbsp;começou a chover,', 'tempo', 'temporal'],
+    ['<span class="cx">Embora</span>&nbsp;o estádio estivesse cheio,', 'concessão', 'concessiva'],
+    ['<span class="cx">Para que</span>&nbsp;ninguém se machucasse,', 'finalidade', 'final']];
+  const advTag = document.getElementById('advTag'), advOut = document.getElementById('advOut');
+  document.querySelectorAll('#advChips .chipbtn').forEach(b => b.onclick = () => {
+    const a = ADV[+b.dataset.i];
+    document.querySelectorAll('#advChips .chipbtn').forEach(x => x.setAttribute('aria-pressed', x === b));
+    advTag.innerHTML = a[0];
+    advOut.innerHTML = `Circunstância: <span>${a[1]}</span> · oração adverbial <span>${a[2]}</span>`;
+  });
+
+  // 9 — testes
+  const TESTS = [
+    { s: ['Espero <span class="cx">isso</span>.', '<span class="ok">✔ Funciona.</span> É substantiva.'],
+      a: ['<span class="cx">Por isso</span>, o jogo foi adiado.', '<span class="ok">✔ Só um advérbio cabe no lugar.</span> “Isso” sozinho não funciona. É adverbial.'] },
+    { s: ['Espero <span class="cx">o quê?</span>', 'Responde “o quê?”, como um objeto. É substantiva.'],
+      a: ['<span class="cx">Por que</span> o jogo foi adiado?', 'Responde “por quê?”, uma circunstância de causa. É adverbial.'] },
+    { s: ['Espero ______.', '<span class="bad">✖ Ficou incompleta.</span> A oração retirada era substantiva.'],
+      a: ['O jogo foi adiado.', '<span class="ok">✔ Continua completa.</span> A oração retirada era adverbial.'] }];
+  const tS = document.getElementById('tS'), vS = document.getElementById('vS'), tA = document.getElementById('tA'), vA = document.getElementById('vA');
+  function setTest(i) {
+    document.querySelectorAll('.tbtn').forEach(b => b.setAttribute('aria-pressed', +b.dataset.t === i));
+    const t = TESTS[i]; tS.innerHTML = t.s[0]; vS.innerHTML = t.s[1]; tA.innerHTML = t.a[0]; vA.innerHTML = t.a[1];
+  }
+  document.querySelectorAll('.tbtn').forEach(b => b.onclick = () => setTest(+b.dataset.t));
+  setTest(0);
+
+  // 11 — pegadinhas
+  const ANS = ['Substantiva objetiva direta · “Ele disse isso.”', 'Adverbial consecutiva · tão … que = consequência',
+    'Substantiva objetiva direta · “Não sei isso.”', 'Adverbial condicional · “Nesse caso, sairemos.”',
+    'Substantiva objetiva direta · “Não sei isso.”', 'Adverbial temporal · “Nesse momento, sairemos.”',
+    'Substantiva objetiva direta · “Não sei isso.”', 'Adverbial causal · “Por isso, faltou.”'];
+  const cards = [...document.querySelectorAll('#traps .flipc')];
+  const open = (c, i) => { c.classList.add('open'); c.querySelector('.ans').textContent = ANS[i]; };
+  cards.forEach((c, i) => c.onclick = () => open(c, i));
+  document.getElementById('revealAll').onclick = () => cards.forEach(open);
+
+  // 13 — questão
+  const explain = document.getElementById('explain');
+  document.querySelectorAll('#alts .alt').forEach(b => b.onclick = () => {
+    document.querySelectorAll('#alts .alt').forEach(x => { x.classList.remove('wrong'); x.querySelector('.fb').textContent = ''; });
+    if (b.dataset.ok === '1') { b.classList.add('right'); b.querySelector('.fb').textContent = '✔ isso!'; explain.hidden = false; }
+    else { b.classList.add('wrong'); b.querySelector('.fb').textContent = b.dataset.trap ? 'armadilha!' : 'tente de novo'; }
+  });
+
+  // 14 — quiz
+  const Q = [
+    ['É provável <u class="k">que chova</u>.', 's', 'Substantiva subjetiva: “Isso é provável.”'],
+    ['<u class="k">Embora chovesse</u>, saímos.', 'a', 'Adverbial concessiva: indica oposição.'],
+    ['Tenho medo <u class="k">de que ele desista</u>.', 's', 'Substantiva completiva nominal: completa “medo”.'],
+    ['Comeu tanto <u class="k">que passou mal</u>.', 'a', 'Adverbial consecutiva: tanto … que.'],
+    ['Ninguém sabe <u class="k">onde ele mora</u>.', 's', 'Substantiva objetiva direta: “Ninguém sabe isso.”'],
+    ['<u class="k">Quando o sinal tocou</u>, todos saíram.', 'a', 'Adverbial temporal: “Nesse momento, todos saíram.”']];
+  const quiz = document.getElementById('quiz'), score = document.getElementById('score');
+  const done = new Map();
+  quiz.innerHTML = Q.map((q, i) => `<div class="qi" data-i="${i}"><span class="q">${q[0]}</span><div class="opts"><button class="chipbtn b" type="button" data-v="s" aria-pressed="false">Substantiva</button><button class="chipbtn" type="button" data-v="a" aria-pressed="false">Adverbial</button></div><span class="fb"></span></div>`).join('');
+  quiz.querySelectorAll('.qi').forEach(card => card.querySelectorAll('button').forEach(b => b.onclick = () => {
+    const i = +card.dataset.i, ok = b.dataset.v === Q[i][1];
+    card.querySelectorAll('button').forEach(x => x.setAttribute('aria-pressed', x === b));
+    card.classList.toggle('good', ok); card.classList.toggle('miss', !ok);
+    card.querySelector('.fb').innerHTML = (ok ? '<span class="ok">✔ Certo.</span> ' : '<span class="bad">✖ Não.</span> ') + Q[i][2];
+    done.set(i, ok);
+    const right = [...done.values()].filter(Boolean).length;
+    score.textContent = `${done.size} de ${Q.length} respondidas · ${right} certas`;
+  }));
+
+  // capa — campos editáveis (salvos só neste navegador)
+  const names = document.getElementById('thanksNames');
+  const fields = [...document.querySelectorAll('.field')];
+  function syncThanks() {
+    const n = document.querySelector('.field[data-key="nomes"]').textContent.trim();
+    names.textContent = n ? n : '';
+    names.hidden = !n;
+  }
+  fields.forEach(f => {
+    try { const v = localStorage.getItem('capa-' + f.dataset.key); if (v) f.textContent = v; } catch (e) {}
+    f.addEventListener('input', () => { try { localStorage.setItem('capa-' + f.dataset.key, f.textContent.trim()); } catch (e) {} if (!f.textContent.trim()) f.textContent = ''; syncThanks(); });
+    f.addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); f.blur(); } });
+  });
+  syncThanks();
+
+  show(fromHash(), false);
+})();
+</script>
+
+</body>
+</html>

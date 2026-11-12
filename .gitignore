@@ -1,0 +1,4 @@
+node_modules/
+preview/
+*.log
+video_raw.mp4
